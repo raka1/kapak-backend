@@ -4,7 +4,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { Strategy as FacebookStrategy } from 'passport-facebook'
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
-import router from './routes/router'
+import router from '@/routes/router'
 import dotenv from 'dotenv'
 
 dotenv.config()
