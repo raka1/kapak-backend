@@ -1,0 +1,43 @@
+{
+  "name": "kapak-backend",
+  "description": "Backend for kapak",
+  "version": "0.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon"
+  },
+  "author": "Raka <p.raka54@ymail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "form-data": "^4.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-passport": "^6.0.0",
+    "koa-router": "^13.0.1",
+    "mailgun.js": "^10.2.4",
+    "mongoose": "^8.8.1",
+    "passport-facebook": "^3.0.0",
+    "passport-google-oauth20": "^2.0.0",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/koa": "^2.15.0",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa-passport": "^6.0.3",
+    "@types/koa-router": "^7.4.8",
+    "@types/mongoose": "^5.11.96",
+    "@types/passport-facebook": "^3.0.3",
+    "@types/passport-google-oauth20": "^2.0.16",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.6.3"
+  }
+}

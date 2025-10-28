@@ -1,0 +1,6 @@
+.vscode/*
+!.vscode/extensions.json
+.qodo
+node_modules
+dist
+.env
