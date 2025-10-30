@@ -29,7 +29,7 @@ app.use(passport.initialize())
 // CORS
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.FRONT_END,
     allowMethods: ['GET', 'POST'],
   })
 )
