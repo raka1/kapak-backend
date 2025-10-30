@@ -3,7 +3,10 @@ import passport from 'koa-passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { Strategy as FacebookStrategy } from 'passport-facebook'
 import Koa from 'koa'
+import cors from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
+import ratelimit from 'koa-ratelimit'
+import Redis from 'ioredis'
 import router from '@/routes/router'
 import dotenv from 'dotenv'
 
@@ -13,24 +16,35 @@ const PORT = process.env.PORT as string
 const MONGO_URI = process.env.MONGO_URI as string
 
 const app = new Koa()
+const redis = new Redis({
+  host: process.env.REDIS_HOST,
+  port: Number(process.env.REDIS_PORT),
+  password: process.env.REDIS_PASSWORD || undefined,
+})
 
 // middleware
 app.use(bodyParser())
 app.use(passport.initialize())
 
-const origin = process.env.FRONT_END as string
+// CORS
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    allowMethods: ['GET', 'POST'],
+  })
+)
 
-app.use(async (ctx, next) => {
-  const referer = ctx.get('Referer')
-
-  if ((!referer || !referer.startsWith(origin)) && process.env.NODE_ENV == 'production') {
-    ctx.status = 403
-    ctx.body = 'Forbidden: Invalid origin or referer'
-    return
-  }
-
-  await next()
-})
+// Rate Limiter
+app.use(
+  ratelimit({
+    driver: 'redis',
+    db: redis,
+    duration: 60000,
+    errorMessage: 'Too many requests, please try again later.',
+    id: (ctx) => ctx.ip,
+    max: 60,
+  })
+)
 
 // DB connect
 mongoose
