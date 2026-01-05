@@ -4,6 +4,8 @@ import jwt, { JwtPayload } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import User, { IUser } from '@/models/m_auth_users'
 
+const dummy_password = '$2a$12$1RTzOs.1F1MmfVYOsjDr8eA06pN6wrA0P9RZ.6ExDau/dGpxYGQ5e'
+
 export const getUsers = async (ctx: Context) => {
   try {
     const users = await User.find()
@@ -72,8 +74,10 @@ export const login = async (ctx: Context) => {
     if (!user) user = await User.findOne({ email: username.toLowerCase() })
 
     if (!user) {
-      ctx.status = 404
-      ctx.body = { response: 'USER_NOT_FOUND' }
+      await bcrypt.compare(password, dummy_password)
+
+      ctx.status = 401
+      ctx.body = { response: 'INVALID_CREDENTIALS' }
       return
     }
 
@@ -90,7 +94,7 @@ export const login = async (ctx: Context) => {
 
     if (!(await bcrypt.compare(password, user.password as string))) {
       ctx.status = 401
-      ctx.body = { response: 'INVALID_PASSWORD' }
+      ctx.body = { response: 'INVALID_CREDENTIALS' }
       return
     }
 
