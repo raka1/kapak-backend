@@ -159,6 +159,7 @@ export const createUser = async (ctx: Context) => {
       password: await bcrypt.hash(password, salt),
       login_method: 'native',
       status: 'active',
+      custom: true,
     })
 
     ctx.status = 200

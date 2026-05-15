@@ -10,6 +10,8 @@ export interface IUser extends Document {
   google_id?: string
   facebook_id?: string
   status: 'active' | 'inactive' | 'banned'
+  deleted_at?: Date
+  custom?: boolean
   cart?: {
     items: Array<{
       product: Schema.Types.ObjectId
@@ -19,7 +21,6 @@ export interface IUser extends Document {
       checked: boolean
     }>
   }
-  deleted_at?: Date
 }
 
 const UserSchema: Schema = new Schema(
@@ -39,6 +40,7 @@ const UserSchema: Schema = new Schema(
       default: 'active',
     },
     deleted_at: { type: Date },
+    custom: { type: Boolean, default: false },
     cart: {
       items: [
         {
