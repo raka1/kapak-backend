@@ -12,7 +12,6 @@ import cors from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
 import ratelimit from 'koa-ratelimit'
 import Redis from 'ioredis'
-import proxy from 'koa-proxies'
 import apiRouter from '@/routes/api'
 
 const PORT = process.env.PORT as string || '3000'
@@ -96,12 +95,6 @@ app.use(async (ctx, next) => {
 
 // Router
 app.use(apiRouter.routes()).use(apiRouter.allowedMethods())
-
-// Proxy for frontend
-app.use(proxy('/', {
-  target: process.env.FRONT_END as string,
-  changeOrigin: true
-}))
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
