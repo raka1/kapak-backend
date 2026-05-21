@@ -87,7 +87,7 @@ const rateLimiter = ratelimit({
 
 // Rate Limiter
 app.use(async (ctx, next) => {
-  if (ctx.path.startsWith('/api')) {
+  if (ctx.path.startsWith('/api/v1')) {
     return rateLimiter(ctx, next)
   }
 
@@ -100,8 +100,7 @@ app.use(apiRouter.routes()).use(apiRouter.allowedMethods())
 // Proxy for frontend
 app.use(proxy('/', {
   target: process.env.FRONT_END as string,
-  changeOrigin: true,
-  logs: true
+  changeOrigin: true
 }))
 
 app.listen(PORT, () => {
