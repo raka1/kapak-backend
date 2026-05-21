@@ -78,10 +78,10 @@ passport.use(
 const rateLimiter = ratelimit({
   driver: 'redis',
   db: redis,
-  duration: 60000,
+  duration: Number(process.env.REDIS_RATE_LIMIT_DURATION),
   errorMessage: 'Too many requests, please try again later.',
   id: (ctx) => ctx.ip,
-  max: 60,
+  max: Number(process.env.REDIS_RATE_LIMIT_MAX),
 })
 
 // Rate Limiter
