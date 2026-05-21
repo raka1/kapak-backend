@@ -1,3 +1,8 @@
+
+import dotenv from 'dotenv'
+
+dotenv.config()
+
 import mongoose from 'mongoose'
 import passport from 'koa-passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
@@ -7,12 +12,10 @@ import cors from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
 import ratelimit from 'koa-ratelimit'
 import Redis from 'ioredis'
-import router from '@/routes/router'
-import dotenv from 'dotenv'
+import proxy from 'koa-proxies'
+import apiRouter from '@/routes/api'
 
-dotenv.config()
-
-const PORT = process.env.PORT as string
+const PORT = process.env.PORT as string || '3000'
 const MONGO_URI = process.env.MONGO_URI as string
 
 const app = new Koa()
@@ -22,27 +25,13 @@ const redis = new Redis({
   password: process.env.REDIS_PASSWORD || undefined,
 })
 
-// middleware
+// Middleware
 app.use(bodyParser())
 app.use(passport.initialize())
-
-// CORS
 app.use(
   cors({
     origin: process.env.FRONT_END,
     allowMethods: ['GET', 'POST'],
-  })
-)
-
-// Rate Limiter
-app.use(
-  ratelimit({
-    driver: 'redis',
-    db: redis,
-    duration: 60000,
-    errorMessage: 'Too many requests, please try again later.',
-    id: (ctx) => ctx.ip,
-    max: 60,
   })
 )
 
@@ -87,9 +76,34 @@ passport.use(
   )
 )
 
-// router
-app.use(router.routes()).use(router.allowedMethods())
+const rateLimiter = ratelimit({
+  driver: 'redis',
+  db: redis,
+  duration: 60000,
+  errorMessage: 'Too many requests, please try again later.',
+  id: (ctx) => ctx.ip,
+  max: 60,
+})
 
-app.listen(3000, () => {
+// Rate Limiter
+app.use(async (ctx, next) => {
+  if (ctx.path.startsWith('/api')) {
+    return rateLimiter(ctx, next)
+  }
+
+  await next()
+})
+
+// Router
+app.use(apiRouter.routes()).use(apiRouter.allowedMethods())
+
+// Proxy for frontend
+app.use(proxy('/', {
+  target: process.env.FRONT_END as string,
+  changeOrigin: true,
+  logs: true
+}))
+
+app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })

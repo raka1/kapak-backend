@@ -30,7 +30,9 @@ import {
 import { getAutoCompletes } from '@/controllers/item_autocompletes'
 import { getCategories } from '@/controllers/item_categories'
 
-const router = new Router()
+const router = new Router({
+  prefix: process.env.API_PREFIX,
+})
 
 // auth
 router.get('/auth/auto_login', autoLogin)
