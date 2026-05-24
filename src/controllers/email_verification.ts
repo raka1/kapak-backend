@@ -62,11 +62,48 @@ export const sendEmail = async (ctx: Context) => {
       return
     }
 
+    const htmlContent = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td style="text-align: center; padding-bottom: 20px;">
+            <h2 style="margin: 0; color: #212529; font-size: 22px; letter-spacing: 0.5px;">Kapak</h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="background-color: #ffffff; padding: 30px; border-radius: 6px; border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            <p style="margin-top: 0; margin-bottom: 16px; font-size: 16px; line-height: 1.5; color: #6c757d;">
+              Halo,
+            </p>
+            <p style="margin-top: 0; margin-bottom: 24px; font-size: 15px; line-height: 1.5; color: #6c757d;">
+              Use the verification code below to continue the registration or authentication process for your account:
+            </p>
+
+            <div style="text-align: center; background-color: #f8f9fa; border: 1px dashed #ced4da; padding: 15px; border-radius: 6px; margin-bottom: 24px;">
+              <span style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #1a237e; font-family: monospace;">${gen}</span>
+            </div>
+
+            <p style="margin-top: 0; margin-bottom: 0; font-size: 13px; line-height: 1.5; color: #6c757d; text-align: center;">
+              *This code is valid for 30 minutes. Do not share this code with anyone for your account security.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; padding-top: 20px;">
+            <p style="margin: 0; font-size: 12px; color: #6c757d;">
+              &copy; ${new Date().getFullYear()} Kapak. All rights reserved.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </div>
+    `
+        
     await mg.messages.create(process.env.MAILGUN_DOMAIN as string, {
       from: `${process.env.USER_EMAIL} <${process.env.EMAIL}>`,
       to: email,
-      subject: 'Code',
-      html: `<h1>${gen}</h1>`,
+      subject: `[Kapak] Your Account Verification Code - ${gen}`,
+      html: htmlContent,
     })
 
     const now = new Date()
