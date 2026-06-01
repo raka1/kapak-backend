@@ -1,6 +1,6 @@
 {
-  "name": "kapak-backend",
-  "description": "Backend for kapak",
+  "name": "kapak-api",
+  "description": "API for kapak",
   "version": "0.0.0",
   "main": "dist/index.js",
   "scripts": {
