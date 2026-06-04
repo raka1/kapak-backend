@@ -1,16 +1,26 @@
 import { Context } from 'koa'
 import Product from '@/models/m_item_products'
+import Category from '@/models/m_item_categories'
 
 export const getProducts = async (ctx: Context) => {
   try {
-    const { q, np, xp, shop, skip, limit } = ctx.query
+    const { q, ct, np, xp, shop, skip, limit } = ctx.query
     let products
+    let subs: string[] = []
+
+    if (ct) {
+      const categories = await Category.find({ slug: { $in: (ct as string).split(',') } })
+      if (categories) {
+        subs = categories.flatMap(category => category.sub)
+      }
+    }
 
     if (q) {
       products = await Product.aggregate([
         {
           $match: {
             name: { $regex: q, $options: 'i' },
+            ...(ct && { category: { $in: subs } }),
             ...(np && { 'variants.0.price': { $gte: parseInt(np as string) } }),
             ...(xp && { 'variants.0.price': { $lte: parseInt(xp as string) } }),
           },
