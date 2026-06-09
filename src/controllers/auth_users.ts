@@ -21,12 +21,20 @@ export const autoLogin = async (ctx: Context) => {
   ctx.set('Cache-Control', 'no-store, must-revalidate')
   try {
     const token = ctx.cookies.get('token')
+
+    if (!token) {
+      ctx.status = 200
+      ctx.body = { response: 'NO_TOKEN' }
+      return
+    }
+
     const decoded = jwt.verify(token as string, process.env.JWT_SECRET_KEY as string) as JwtPayload
 
     ctx.status = 200
     ctx.body = { response: 'SUCCESS', body: decoded.username }
   } catch (error) {
-    ctx.status = 401
+    console.error(error)
+    ctx.status = 200
     ctx.body = { response: 'INVALID_TOKEN' }
   }
 }
@@ -45,6 +53,7 @@ export const checkEmail = async (ctx: Context) => {
     ctx.status = 200
     ctx.body = { response: 'SUCCESS' }
   } catch (error) {
+    console.error(error)
     ctx.status = 500
     ctx.body = { response: 'SERVER_ERROR' }
   }
@@ -143,17 +152,17 @@ export const createUser = async (ctx: Context) => {
       return
     }
 
-    const existingEmail = await User.findOne({ email: email })
+    const existingEmail = await User.findOne({ email: email.toLowerCase() })
     if (existingEmail) {
       ctx.status = 409
-      ctx.body = { response: 'USER_NOT_FOUND' }
+      ctx.body = { response: 'EMAIL_ALREADY_EXISTS' }
       return
     }
 
     await User.create({
       first_name: first_name,
       last_name: last_name,
-      email: email,
+      email: email.toLowerCase(),
       phone_number: phone_number,
       username: userGet,
       password: await bcrypt.hash(password, salt),
