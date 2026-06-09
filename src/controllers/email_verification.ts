@@ -1,6 +1,5 @@
 import { Context } from 'koa'
-import formData from 'form-data'
-import Mailgun from 'mailgun.js'
+import { Resend } from 'resend';
 import Verif from '@/models/m_auth_verifs'
 
 export const emailVerification = async (ctx: Context) => {
@@ -42,11 +41,8 @@ export const sendEmail = async (ctx: Context) => {
     const { email } = ctx.request.body as {
       email: string
     }
-    const mailgun = new Mailgun(formData)
-    const mg = mailgun.client({
-      username: 'api',
-      key: process.env.MAILGUN_API_KEY as string,
-    })
+    const resend = new Resend(process.env.RESEND_API_KEY as string);
+
 
     const holdOn = await Verif.findOne({
       email: email,
@@ -91,16 +87,16 @@ export const sendEmail = async (ctx: Context) => {
         <tr>
           <td style="text-align: center; padding-top: 20px;">
             <p style="margin: 0; font-size: 12px; color: #6c757d;">
-              &copy; ${new Date().getFullYear()} Kapak. All rights reserved.
+              &copy; ${new Date().getFullYear()} Kapak, Powered by Rondeletia. All rights reserved.
             </p>
           </td>
         </tr>
       </table>
     </div>
     `
-        
-    await mg.messages.create(process.env.MAILGUN_DOMAIN as string, {
-      from: `${process.env.USER_EMAIL} <${process.env.EMAIL}>`,
+ 
+    await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL as string,
       to: email,
       subject: `[Kapak] Your Account Verification Code - ${gen}`,
       html: htmlContent,
